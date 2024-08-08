@@ -1,0 +1,90 @@
+import React, { useEffect, useState } from 'react';
+
+function EventList() {
+    const [events, setEvents] = useState([]);
+
+    useEffect(() => {
+        fetch('/api/events')
+            .then(response => response.json())
+            .then(data => setEvents(data));
+    }, []);
+
+    return (
+        <div>
+            <h1>Available Events</h1>
+            <ul>
+                {events.map(event => (
+                    <li key={event.id}>
+                        <h2>{event.title}</h2>
+                        <p>{event.description}</p>
+                        <a href={/event/${event.id}}>View Details</a>
+                    </li>
+                ))}
+            </ul>
+        </div>
+    );
+}
+
+export default EventList;
+6. Back-End Development
+Set Up API Routes:
+GET /api/events: List all events.
+GET /api/events/:id: Get details of a specific event.
+POST /api/book: Handle booking requests.
+POST /api/pay: Process payments.
+Sample Express Route for Event Listing:
+
+javascript
+Copy code
+const express = require('express');
+const Event = require('./models/Event'); // Assuming a Mongoose model
+const router = express.Router();
+
+router.get('/events', async (req, res) => {
+    try {
+        const events = await Event.find();
+        res.json(events);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+module.exports = router;
+7. User Authentication
+User Registration and Login: Implement JWT (JSON Web Token) or sessions to manage user authentication.
+Protect Routes: Restrict access to certain routes based on user roles (admin/user).
+8. Payment Integration
+Stripe API: For payment processing.
+Booking Confirmation: After successful payment, mark the booking as confirmed.
+Sample Stripe Integration (Node.js):
+
+javascript
+Copy code
+const stripe = require('stripe')('your_stripe_secret_key');
+
+router.post('/pay', async (req, res) => {
+    const { amount, currency, source } = req.body;
+
+    try {
+        const charge = await stripe.charges.create({
+            amount,
+            currency,
+            source,
+        });
+
+        res.json({ success: true, charge });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+
+
+
+
+
+
+
+
+
+ChatGPT can make mistakes. Check important info.
